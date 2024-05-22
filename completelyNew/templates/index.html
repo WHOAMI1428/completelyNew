@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Web Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $("#create_black_workpiece_btn").click(function(){
+                $.ajax({
+                    type: "GET",
+                    url: "/create_black_workpiece",
+                    success: function(response){
+                        $(".container").append(response); // 将新创建的工件添加到容器中
+                    }
+                });
+            });
+
+            $("#move_workpiece_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/move_workpiece",
+                    success: function(response){
+                        $(".workpiece").each(function(){
+                            var currentPosition = $(this).position().left; // 获取当前工件的位置
+                            $(this).animate({left: currentPosition + 20}, 500); // 使用动画效果将工件向右移动 20px
+                        });
+                    }
+                });
+            });
+
+            $("#move_to_barrier_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/move_to_barrier",
+                    success: function(response){
+                        var barrierLeft = $(".barrier-arm").position().left;
+                        $(".workpiece").each(function(){
+                            $(this).animate({left: barrierLeft}, 500); // 将工件移动到障碍臂的位置
+                        });
+                    }
+                });
+            });
+
+            $("#move_to_chute3_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/move_to_chute3",
+                    success: function(response){
+                        var chute2Left = $(".chute3").position().left;
+                        var barrierTop = $(".workpiece").position().top;
+                        $(".workpiece").each(function(){
+                            var currentLeft = $(this).position().left;
+                            $(this).animate({left: chute2Left, top: barrierTop}, 500, function(){
+                                $(this).animate({top: '+=50px'}, 500); // 先右移再下移
+                            });
+                        });
+                    }
+                });
+            });
+
+            $("#retract_barrier_arm_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/retract_barrier_arm",
+                    success: function(response){
+                        $(".barrier-arm").each(function(){
+                            $(this).css({top: "+=50px"}); // 向下移动 50px
+                        });
+                    }
+                });
+            });
+
+            $("#extend_barrier_arm_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/extend_barrier_arm",
+                    success: function(response){
+                        $(".barrier-arm").each(function(){
+                            $(this).css({top: "-=50px"}); // 向上移动 50px
+                        });
+                    }
+                });
+            });
+
+            $("#retract_sorting_arm1_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/retract_sorting_arm1",
+                    success: function(response){
+                        $(".sorting-arm1").each(function(){
+                            $(this).css({top: "+=50px"}); // 向下移动 50px
+                        });
+                    }
+                });
+            });
+
+            $("#extend_sorting_arm1_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/extend_sorting_arm1",
+                    success: function(response){
+                        $(".sorting-arm1").each(function(){
+                            $(this).css({top: "-=50px"}); // 向上移动 50px
+                        });
+                    }
+                });
+            });
+
+            $("#retract_sorting_arm2_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/retract_sorting_arm2",
+                    success: function(response){
+                        $(".sorting-arm2").each(function(){
+                            $(this).css({top: "+=50px"}); // 向下移动 50px
+                        });
+                    }
+                });
+            });
+
+            $("#extend_sorting_arm2_btn").click(function(){
+                $.ajax({
+                    type: "POST",
+                    url: "/extend_sorting_arm2",
+                    success: function(response){
+                        $(".sorting-arm2").each(function(){
+                            $(this).css({top: "-=50px"}); // 向上移动 50px
+                        });
+                    }
+                });
+            });
+
+            $("#forward").click(function(){
+                $("#move_to_barrier_btn").click();
+                    // 执行 extend barrier arm 操作
+                setTimeout(function(){
+                    $("#extend_barrier_arm_btn").click();
+
+                    setTimeout(function(){
+                        $("#extend_sorting_arm1_btn").click();
+
+                        setTimeout(function(){   
+                            $("#extend_sorting_arm2_btn").click(); 
+
+                            setTimeout(function(){
+                                $("#move_to_chute3_btn").click(); 
+                            },500);
+
+                        }, 500);
+
+
+                    }, 500);
+                }, 500);
+            });
+            
+        });
+    </script>
+</head>
+<body>
+    <div class="button-container">
+        <button id="create_black_workpiece_btn">Create Black Workpiece</button>
+        <button id="move_workpiece_btn">Move Workpieces</button>
+        <button id="move_to_barrier_btn">Move to Barrier Arm</button>
+        <button id="move_to_chute3_btn">Move to Chute 3</button>
+        <button id="retract_barrier_arm_btn">Retract Barrier Arm</button>
+        <button id="extend_barrier_arm_btn">Extend Barrier Arm</button>
+        <button id="retract_sorting_arm1_btn">Retract Sorting Arm 1</button>
+        <button id="extend_sorting_arm1_btn">Extend Sorting Arm 1</button>
+        <button id="retract_sorting_arm2_btn">Retract Sorting Arm 2</button>
+        <button id="extend_sorting_arm2_btn">Extend Sorting Arm 2</button>
+        <button id="forward">Forward</button>
+    </div>
+    <div class="container">
+        <div class="barrier-arm" style="top: 100px;"></div>
+        <div class="sorting-arm1" style="top: 100px;"></div>
+        <div class="sorting-arm2" style="top: 100px;"></div>
+        <div class="chute chute1" style="top: 150px; left: calc(10% + 10px);"></div>
+        <div class="chute chute2" style="top: 150px; left: calc(30% + 10px);"></div>
+        <div class="chute chute3" style="top: 150px; left: calc(50% + 10px);"></div>
+    </div>
+</body>
+</html>
